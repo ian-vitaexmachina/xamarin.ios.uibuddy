@@ -1,10 +1,10 @@
-# xamarin.ios.stacklayout
+# Xamarin.iOS.StackLayout
 A programmatic approach to building Xamarin.iOS UIs with stack views and animations
 
-# Why? Doesn't Xamarin.iOS already have two stack layout classes?
+## Why? Doesn't Xamarin.iOS already have two stack layout classes?
 Yes, it does. They also work quite well for many tasks, but I wanted to create more control (my way) and to include animations for the content inside the stack nodes. I also find coding fiddly (x, y, width, height) problems strangely amusing, so I wanted to create one myself.
 
-# Key Features
+## Key Features
 1. VerticalLayout 
 2. HorizontalLayout
 3. Nested layouts inside other layouts
@@ -15,7 +15,7 @@ Yes, it does. They also work quite well for many tasks, but I wanted to create m
 8. Slide animations for controls on segues into / out of a storyboard
 9. Debug mode where you can see outlines of controls and nesting during development 
 
-# An example
+## An example
 ```c#
 // Create a new vertical layout, as wide as the screen, 150 points hight, with border indents
 UIBuddyLayoutVertical vLayout = new UIBuddyLayoutVertical(View, 0, 150, 5, 5, 20, 0, 0);
