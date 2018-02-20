@@ -22,7 +22,11 @@ UIBuddyLayoutVertical vLayout = new UIBuddyLayoutVertical(View, 0, 150, 5, 5, 20
 
 // Create a UILabel 100 points wide and 20 points high
 buddyLabel = new UIBuddyViewBase<UILabel>(vLayout, UIBuddyControlHelper.H1(new CGRect(0,0,100,20)));
+
+// Add the Lable to the vertical layout with Flex of 1 (takes up the whole control)
 vLayout.AddWithFlex(buddyLabel, 1);
+
+// And set some control details (buddyLabel.Control is of type UILabel in this case)
 buddyLabel.Control.Text = "Vita Ex Machina";
 buddyLabel.Control.TextAlignment = UITextAlignment.Center;
 buddyLabel.HorizontalAlign = Align.Center;
