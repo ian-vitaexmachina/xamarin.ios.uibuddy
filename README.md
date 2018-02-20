@@ -1,4 +1,4 @@
-# Xamarin.iOS.UIBuddy.StackLayout
+# Xamarin.iOS.UIBuddy
 A programmatic approach to building Xamarin.iOS UIs with stack views and animations
 
 ## Why? Doesn't Xamarin.iOS already have two stack layout classes?
