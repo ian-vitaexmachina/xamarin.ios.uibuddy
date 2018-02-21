@@ -10,6 +10,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
     {
         public UIBuddyAnimateDirection AnimDirection { get; set; }
         public double AnimDelay { get; set; }
+        public nfloat AnimDistance { get; set; }
         public bool FadeIn { get; set; }
         public UIView BuddyControl { get; set; }
         public UIBuddyLayoutBase StackControl { get; set; }
@@ -121,9 +122,6 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                 }
             }
 
-            // Resize (TODO: remover later)
-            //ReCalculate();
-
             return containerView;
         }
 
@@ -211,6 +209,13 @@ namespace vitaexmachina.xamarin.ios.uibuddy
 
                 if (node.Control.VerticalAlign == Align.Center) {
                     node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X, node.Control.BuddyControl.Superview.Center.Y - node.Control.BuddyControl.Superview.Frame.Top);
+                }
+
+                // Animation primings
+                if (node.Control.AnimDirection == UIBuddyAnimateDirection.Left) {
+                    node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X + node.Control.AnimDistance, node.Control.BuddyControl.Center.Y);
+                } else if (node.Control.AnimDirection == UIBuddyAnimateDirection.Right) {
+                    node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X - node.Control.AnimDistance, node.Control.BuddyControl.Center.Y);
                 }
 
                 // Resize and reposition contained stacks - but only stacks that are contained!

@@ -11,6 +11,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         public T Control { get; set; }
         public UIBuddyAnimateDirection AnimDirection { get; set; }
         public double AnimDelay { get; set; }
+        public nfloat AnimDistance { get; set; }
         public bool FadeIn { get; set; }
         public UIView BuddyControl { get; set; }
         public UIBuddyLayoutBase StackControl { get; set; }
@@ -23,6 +24,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         {
             Control = control;
             BuddyControl = control;
+            AnimDirection = UIBuddyAnimateDirection.None;
         }
 
         public UIBuddyViewBase<T> CentreHorizontal()
@@ -64,27 +66,11 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             return this;
         }
 
-        public UIBuddyViewBase<T> WillAnimate(UIBuddyControlHelper helper, UIBuddyAnimateDirection direction, double delay)
+        public UIBuddyViewBase<T> WillAnimate(UIBuddyControlHelper helper, UIBuddyAnimateDirection direction, nfloat distance, double delay)
         {
             AnimDirection = direction;
             AnimDelay = delay;
-
-            if (AnimDirection == UIBuddyAnimateDirection.Left)
-            {
-                Translate(40,0);
-            }
-            else if (AnimDirection == UIBuddyAnimateDirection.Right)
-            {
-                Translate(-40,0);
-            }
-            else if (AnimDirection == UIBuddyAnimateDirection.Up)
-            {
-                Control.Center = new CGPoint(Control.Center.X, Control.Center.Y - 40);
-            }
-            else if (AnimDirection == UIBuddyAnimateDirection.Down)
-            {
-                Control.Center = new CGPoint(Control.Center.X, Control.Center.Y + 40);
-            }
+            AnimDistance = distance;
 
             helper.animationList.Add(this);
 
@@ -110,18 +96,18 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             if (AnimDirection == UIBuddyAnimateDirection.Left)
             {
                 UIView.AnimateNotify(duration, AnimDelay, UIViewAnimationOptions.CurveEaseOut,
-(Action)(() =>
+                (Action)(() =>
                 {
-                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X - 40), (nfloat)this.Control.Center.Y);
+                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X - AnimDistance), (nfloat)this.Control.Center.Y);
                     this.Control.Alpha = 1;
                 }), null);
             }
             else
             {
                 UIView.AnimateNotify(duration, AnimDelay, UIViewAnimationOptions.CurveEaseOut,
-(Action)(() =>
+                (Action)(() =>
                 {
-                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X + 40), (nfloat)this.Control.Center.Y);
+                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X + AnimDistance), (nfloat)this.Control.Center.Y);
                     this.Control.Alpha = 1;
                 }), null);
             }
