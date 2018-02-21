@@ -9,7 +9,9 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         UIBuddyAnimateDirection AnimDirection { get; set; }
         double AnimDelay { get; set; }
         bool FadeIn { get; set; }
+        bool IsNested { get; set; }
         UIView BuddyControl { get; set; }
+        UIBuddyLayoutBase StackControl { get; set; }
         void AnimateIn(double duration = 1.0f);
         Align HorizontalAlign { get; set; }
         Align VerticalAlign { get; set; }

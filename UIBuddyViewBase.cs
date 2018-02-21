@@ -13,6 +13,8 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         public double AnimDelay { get; set; }
         public bool FadeIn { get; set; }
         public UIView BuddyControl { get; set; }
+        public UIBuddyLayoutBase StackControl { get; set; }
+        public bool IsNested { get; set; }
 
         public Align HorizontalAlign { get; set; }
         public Align VerticalAlign { get; set; }

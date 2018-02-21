@@ -6,11 +6,18 @@ using System.Collections.Generic;
 namespace vitaexmachina.xamarin.ios.uibuddy
 {
     
-    public class UIBuddyLayoutBase : UIView
+    public class UIBuddyLayoutBase : UIView, IUIBuddyControl
     {
         public UIBuddyAnimateDirection AnimDirection { get; set; }
         public double AnimDelay { get; set; }
         public bool FadeIn { get; set; }
+        public UIView BuddyControl { get; set; }
+        public UIBuddyLayoutBase StackControl { get; set; }
+        public Align HorizontalAlign { get; set; }
+        public Align VerticalAlign { get; set; }
+        public bool IsNested { get; set; }
+
+
         public bool DebugMode { get; set; }
         public nfloat PaddingInner { get; set; }
 
@@ -32,8 +39,10 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             PaddingRight = paddingRight;
             PaddingBottom = paddingBottom;
             PaddingInner = paddingInner;
+            BuddyControl = this;
 
             if (view != null) {
+                
                 view.AddSubview(this);
 
                 // Set the width and height based on inputs
@@ -65,6 +74,11 @@ namespace vitaexmachina.xamarin.ios.uibuddy
 
         protected UIView Add(IUIBuddyControl subControl, int flex, int height, int width) 
         {
+            if(subControl is UIBuddyLayoutBase) {
+                subControl.StackControl = subControl as UIBuddyLayoutBase;
+                subControl.StackControl.IsNested = true;
+            }
+
             int containerHeight = 0;
             int containerWidth = 0;
 
@@ -178,36 +192,31 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                     _height = (node.Height == 0) ? (nfloat)node.Parent.Frame.Height - (PaddingTop + PaddingBottom) : node.Height;
                 }
 
-
-
                 if (this is UIBuddyLayoutVertical) {
                     // Resize and reposition the vertical bounding layouts
-
-                    //Frame = new CGRect(enclosingFrame.X + PaddingLeft, enclosingFrame.Y + PaddingTop, _width, _height);
                     node.Parent.Frame = new CGRect(0, previousBottom, newWidth, newHeight);
                     previousBottom = node.Parent.Frame.Bottom + PaddingInner;
 
                 } else if (this is UIBuddyLayoutHorizontal) {
 
                     // Resize and reposition the horizontal bounding layouts
-                    if (node.Control.BuddyControl is UIBuddyLayoutBase) {
-                        Frame = new CGRect(node.Parent.Frame.X + PaddingLeft, node.Parent.Frame.Y + PaddingTop, _width, _height);
-                    } else {
-                        node.Parent.Frame = new CGRect(previousLeft, 0, newWidth, newHeight);
-                    }
+                    node.Parent.Frame = new CGRect(previousLeft, 0, newWidth, newHeight);
                     previousLeft = node.Parent.Frame.Right;
                 } 
 
                 // Resize and reposition the contained controls
                 if(node.Control.HorizontalAlign == Align.Center) {
                     node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Superview.Center.X - node.Control.BuddyControl.Superview.Frame.X, node.Control.BuddyControl.Center.Y);
-                }
+                } 
 
-                // Resize and reposition the contained controls
                 if (node.Control.VerticalAlign == Align.Center) {
                     node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X, node.Control.BuddyControl.Superview.Center.Y - node.Control.BuddyControl.Superview.Frame.Top);
                 }
 
+                // Resize and reposition contained stacks - but only stacks that are contained!
+                if (node.Control.BuddyControl is UIBuddyLayoutBase && node.Control.StackControl.IsNested)  {
+                    node.Control.BuddyControl.Frame = new CGRect(node.Control.StackControl.PaddingLeft, node.Control.StackControl.PaddingTop, node.Parent.Frame.Width - (nfloat)(node.Control.StackControl.PaddingLeft + node.Control.StackControl.PaddingRight), node.Parent.Frame.Height - (nfloat)(node.Control.StackControl.PaddingTop + node.Control.StackControl.PaddingBottom));
+                }
             }
 
             SetNeedsUpdateConstraints();
