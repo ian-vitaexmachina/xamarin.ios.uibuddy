@@ -1,3 +1,6 @@
+** EXAMPLE CODE, MORE DOCUMENTATION etc. IS COMING IN THE NEXT COUPLE OF DAYS!! **
+
+
 # Xamarin.iOS.UIBuddy
 A programmatic approach to building Xamarin.iOS UIs with stack views and animations
 
