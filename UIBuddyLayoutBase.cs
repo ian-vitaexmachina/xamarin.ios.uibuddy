@@ -17,7 +17,8 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         public Align HorizontalAlign { get; set; }
         public Align VerticalAlign { get; set; }
         public bool IsNested { get; set; }
-
+        public bool ScaleToFit { get; set; }
+        public bool AdjustFontSizeToFit { get; set; }
 
         public bool DebugMode { get; set; }
         public nfloat PaddingInner { get; set; }
@@ -65,12 +66,12 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             ReCalculate();
         }
 
-        public UIView AddWithFlex(IUIBuddyControl subControl, int flex) {
+        public UIView AddFlex(IUIBuddyControl subControl, int flex) {
             return Add(subControl, flex, 0, 0);
         }
 
-        public UIView AddWithHeight(IUIBuddyControl subControl, int height) {
-            return Add(subControl, 0, height, 0);
+        public UIView AddAbsolute(IUIBuddyControl subControl, int width, int height) {
+            return Add(subControl, 0, height, width);
         }
 
         protected UIView Add(IUIBuddyControl subControl, int flex, int height, int width) 
@@ -94,7 +95,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                 containerWidth = width;
                 containerHeight = height;
             }
-        
+
             // Creat a new containing view
             UIView containerView = new UIView();
 
@@ -136,10 +137,10 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             foreach(UIBuddyLayoutNode node in Nodes) {
                 if(this is UIBuddyLayoutVertical) {
                     totalAbsoluteHeight += node.Height;
-                    totalHeightLeft = _height - totalAbsoluteHeight;
+                    totalHeightLeft = Frame.Height - totalAbsoluteHeight;
                 } else {
                     totalAbsoluteWidth += node.Width;
-                    totalWidthLeft = _width - totalAbsoluteWidth;
+                    totalWidthLeft = Frame.Width - totalAbsoluteWidth;
                 }
             }
 
@@ -188,7 +189,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                     // Recalculate our widths and height based on the new enclosing container
                     _width = (node.Width == 0) ? (nfloat)(node.Parent.Frame.Width - (PaddingLeft + PaddingRight)) : node.Width;
                     _height = (node.Height == 0) ? (nfloat)node.Parent.Frame.Height - (PaddingTop + PaddingBottom) : node.Height;
-                }
+                } 
 
                 if (this is UIBuddyLayoutVertical) {
                     // Resize and reposition the vertical bounding layouts
@@ -201,6 +202,40 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                     node.Parent.Frame = new CGRect(previousLeft, 0, newWidth, newHeight);
                     previousLeft = node.Parent.Frame.Right;
                 } 
+
+                if (!(node.Control.BuddyControl is UIBuddyLayoutBase)) {
+                    // This is an actual control - see if there are absolute sizes provided, or if we need to expand to the parent
+                    nfloat w, h;
+                    w = (node.Control.BuddyControl.Frame.Width == 0) ? (nfloat)(node.Control.BuddyControl.Superview.Frame.Width) : node.Control.BuddyControl.Frame.Width;
+                    h = (node.Control.BuddyControl.Frame.Height == 0) ? (nfloat)(node.Control.BuddyControl.Superview.Frame.Height) : node.Control.BuddyControl.Frame.Height;
+                    node.Control.BuddyControl.Frame = new CGRect(0, 0, w, h);
+                }
+
+                if (node.Control.ScaleToFit) {
+                    if (node.Control.BuddyControl is UILabel) {
+
+                        UILabel label = (node.Control.BuddyControl) as UILabel;
+
+                        UIFont font = label.Font;
+                        CGSize size = label.Superview.Frame.Size;
+
+                        for (var maxSize = label.Font.PointSize; maxSize >= label.MinimumScaleFactor * label.Font.PointSize; maxSize -= 1f) {
+                            font = font.WithSize(maxSize);
+                            CGSize constraintSize = new CGSize(size.Width, float.MaxValue);
+                            CGSize labelSize = (label.Text.StringSize(font, constraintSize, UILineBreakMode.WordWrap));
+
+                            if (labelSize.Height <= size.Height) {
+                                label.Font = font;
+                                label.SetNeedsLayout();
+                                break;
+                            }
+                        }
+
+                        // set the font to the minimum size anyway
+                        label.Font = font;
+                        label.SetNeedsLayout();
+                    }
+                }
 
                 // Resize and reposition the contained controls
                 if(node.Control.HorizontalAlign == Align.Center) {
@@ -216,17 +251,22 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                     node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X + node.Control.AnimDistance, node.Control.BuddyControl.Center.Y);
                 } else if (node.Control.AnimDirection == UIBuddyAnimateDirection.Right) {
                     node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X - node.Control.AnimDistance, node.Control.BuddyControl.Center.Y);
+                } else if (node.Control.AnimDirection == UIBuddyAnimateDirection.Up) {
+                    node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X, node.Control.BuddyControl.Center.Y + node.Control.AnimDistance);
+                } else if (node.Control.AnimDirection == UIBuddyAnimateDirection.Down) {
+                    node.Control.BuddyControl.Center = new CGPoint(node.Control.BuddyControl.Center.X, node.Control.BuddyControl.Center.Y - node.Control.AnimDistance);
                 }
 
                 // Resize and reposition contained stacks - but only stacks that are contained!
                 if (node.Control.BuddyControl is UIBuddyLayoutBase && node.Control.StackControl.IsNested)  {
-                    node.Control.BuddyControl.Frame = new CGRect(node.Control.StackControl.PaddingLeft, node.Control.StackControl.PaddingTop, node.Parent.Frame.Width - (nfloat)(node.Control.StackControl.PaddingLeft + node.Control.StackControl.PaddingRight), node.Parent.Frame.Height - (nfloat)(node.Control.StackControl.PaddingTop + node.Control.StackControl.PaddingBottom));
+                node.Control.BuddyControl.Frame = new CGRect(node.Control.StackControl.PaddingLeft, node.Control.StackControl.PaddingTop, node.Parent.Frame.Width - (nfloat)(node.Control.StackControl.PaddingLeft + node.Control.StackControl.PaddingRight), node.Parent.Frame.Height - (nfloat)(node.Control.StackControl.PaddingTop + node.Control.StackControl.PaddingBottom));
                 }
             }
 
             SetNeedsUpdateConstraints();
         }
 
+       
         public UIBuddyLayoutBase WillAnimate(UIBuddyAnimateDirection direction, double delay) {
 
             AnimDirection = direction;

@@ -16,5 +16,6 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         void AnimateIn(double duration = 1.0f);
         Align HorizontalAlign { get; set; }
         Align VerticalAlign { get; set; }
+        bool ScaleToFit { get; set; }
     }
 }

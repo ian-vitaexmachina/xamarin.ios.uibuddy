@@ -1,6 +1,7 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
+using System.Drawing;
 using System.Collections.Generic;
 
 namespace vitaexmachina.xamarin.ios.uibuddy
@@ -16,6 +17,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         public UIView BuddyControl { get; set; }
         public UIBuddyLayoutBase StackControl { get; set; }
         public bool IsNested { get; set; }
+        public bool ScaleToFit { get; set; }
 
         public Align HorizontalAlign { get; set; }
         public Align VerticalAlign { get; set; }
@@ -25,24 +27,6 @@ namespace vitaexmachina.xamarin.ios.uibuddy
             Control = control;
             BuddyControl = control;
             AnimDirection = UIBuddyAnimateDirection.None;
-        }
-
-        public UIBuddyViewBase<T> CentreHorizontal()
-        {
-            Control.Center = new CGPoint(Control.Superview.Center.X - Control.Superview.Frame.X, Control.Center.Y);
-            return this;
-        }
-
-        public UIBuddyViewBase<T> CentreVertical()
-        {
-            Control.Center = new CGPoint(Control.Center.X, Control.Superview.Center.Y);
-            return this;
-        }
-
-        public UIBuddyViewBase<T> Translate(double x, double y)
-        {
-            Control.Center = new CGPoint(Control.Center.X + x, Control.Center.Y + y);
-            return this;
         }
 
         public UIBuddyViewBase<T> TextAlign(UITextAlignment alignment)
@@ -65,6 +49,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
 
             return this;
         }
+
 
         public UIBuddyViewBase<T> WillAnimate(UIBuddyControlHelper helper, UIBuddyAnimateDirection direction, nfloat distance, double delay)
         {
@@ -102,12 +87,27 @@ namespace vitaexmachina.xamarin.ios.uibuddy
                     this.Control.Alpha = 1;
                 }), null);
             }
-            else
+            else if(AnimDirection == UIBuddyAnimateDirection.Right)
             {
                 UIView.AnimateNotify(duration, AnimDelay, UIViewAnimationOptions.CurveEaseOut,
                 (Action)(() =>
                 {
                     this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X + AnimDistance), (nfloat)this.Control.Center.Y);
+                    this.Control.Alpha = 1;
+                }), null);
+            }
+            else if(AnimDirection == UIBuddyAnimateDirection.Up)
+            {
+                UIView.AnimateNotify(duration, AnimDelay, UIViewAnimationOptions.CurveEaseOut,
+                (Action)(() => {
+                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X), (nfloat)this.Control.Center.Y - AnimDistance);
+                    this.Control.Alpha = 1;
+                }), null);
+            } 
+            else if (AnimDirection == UIBuddyAnimateDirection.Down) {
+                UIView.AnimateNotify(duration, AnimDelay, UIViewAnimationOptions.CurveEaseOut,
+                (Action)(() => {
+                    this.Control.Center = new CGPoint((nfloat)(this.Control.Center.X), (nfloat)this.Control.Center.Y + AnimDistance);
                     this.Control.Alpha = 1;
                 }), null);
             }

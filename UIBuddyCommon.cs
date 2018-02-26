@@ -10,6 +10,7 @@ namespace vitaexmachina.xamarin.ios.uibuddy
         Large
     }
 
+
     public class UIBuddyTextStyleBase
     {
 

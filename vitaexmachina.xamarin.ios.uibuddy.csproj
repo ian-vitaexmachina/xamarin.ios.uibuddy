@@ -14,7 +14,7 @@
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>VitaExMachina.Xamarin.iOS.UIBuddy</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <Authors>Ian Sorbello</Authors>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageLicenseUrl>https://github.com/ian-vitaexmachina/xamarin.ios.uibuddy/blob/master/LICENSE</PackageLicenseUrl>
@@ -71,11 +71,13 @@
     <Compile Include="UIBuddyIcon.cs" />
     <Compile Include="UIBuddyViewBase.cs" />
     <Compile Include="IUIBuddyControl.cs" />
-    <Compile Include="UIBuddyControlHelper.cs" />
     <Compile Include="UIBuddyLayoutBase.cs" />
     <Compile Include="UIBuddyLayoutHorizontal.cs" />
     <Compile Include="UIBuddyLayoutVertical.cs" />
     <Compile Include="UIBuddyView.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Entitlements.plist" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="packages\NuGet.Build.Packaging.0.2.0\build\NuGet.Build.Packaging.targets" Condition="Exists('packages\NuGet.Build.Packaging.0.2.0\build\NuGet.Build.Packaging.targets')" />
